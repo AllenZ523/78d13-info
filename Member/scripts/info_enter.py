@@ -1,6 +1,6 @@
 import sqlite3
 import argparse
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 import os
 import json
 
@@ -30,7 +30,7 @@ def get_connection():
 
 def add_member(gaijin_id: str, name: str) -> bool:
 	"""Insert a new member. Returns True on success, False on failure."""
-	join_date = (datetime.utcnow() + timedelta(hours=8)).strftime("%Y-%m-%d %H:%M:%S")
+	join_date = (datetime.now(UTC) + timedelta(hours=8)).strftime("%Y-%m-%d")
 	state = 'N'
 	conn = get_connection()
 	c = conn.cursor()
@@ -49,7 +49,7 @@ def add_member(gaijin_id: str, name: str) -> bool:
 
 def main():
 	parser = argparse.ArgumentParser(description="向成员数据库插入记录：gaijin_id, name")
-	parser.add_argument('gaijin_id', help='外籍号（唯一且必填）')
+	parser.add_argument('gaijin_id', help='盖金号（唯一且必填）')
 	parser.add_argument('name', help='姓名（必填）')
 	args = parser.parse_args()
 

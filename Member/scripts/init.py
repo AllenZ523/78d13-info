@@ -47,7 +47,7 @@ def init_members():
     c.execute('''CREATE TABLE IF NOT EXISTS members
                  (gaijin_id TEXT PRIMARY KEY,
                   name TEXT NOT NULL,
-                  state TEXT NOT NULL,
+                  state TEXT NOT NULL DEFAULT 'N' CHECK(state IN('N','F','C')),
                   join_date TEXT NOT NULL
                  )''')
     c.execute('DROP TRIGGER IF EXISTS prevent_gaijin_id_update')
