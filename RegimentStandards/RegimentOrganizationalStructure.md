@@ -1,4 +1,4 @@
-``` mermaid
+::: mermaid
 flowchart BT
     %% 新人（最底部）
     Newbie[("新人 [N]")]
@@ -55,3 +55,4 @@ flowchart BT
     class TeachingGroup,MatchGroup top
     class DecisionGroup decision
     class Leader top
+:::
