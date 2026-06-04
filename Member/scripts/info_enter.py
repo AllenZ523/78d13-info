@@ -50,7 +50,7 @@ def add_member(gaijin_id: str, name: str) -> bool:
 def main():
 	parser = argparse.ArgumentParser(description="向成员数据库插入记录：gaijin_id, name")
 	parser.add_argument('gaijin_id', help='盖金号（唯一且必填）')
-	parser.add_argument('name', help='姓名（必填）')
+	parser.add_argument('name', help='游戏名称（必填）')
 	args = parser.parse_args()
 
 	if not os.path.exists(datapath):
