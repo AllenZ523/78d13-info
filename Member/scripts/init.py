@@ -48,7 +48,10 @@ def init_members():
                  (gaijin_id TEXT PRIMARY KEY,
                   name TEXT NOT NULL,
                   state TEXT NOT NULL DEFAULT 'N' CHECK(state IN('N','F','C')),
-                  join_date TEXT NOT NULL
+                  join_date TEXT NOT NULL,
+                  landforce TEXT NOT NULL DEFAULT 'Uncertified' CHECK(landforce IN('Uncertified','Certified')),
+                  airforce TEXT NOT NULL DEFAULT 'Uncertified' CHECK(airforce IN('Uncertified','Certified')),
+                  navy TEXT NOT NULL DEFAULT 'Uncertified' CHECK(navy IN('Uncertified','Certified'))
                  )''')
     c.execute('DROP TRIGGER IF EXISTS prevent_gaijin_id_update')
     c.execute('''CREATE TRIGGER prevent_gaijin_id_update
