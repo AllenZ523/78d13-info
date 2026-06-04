@@ -2,8 +2,26 @@ import sqlite3
 import argparse
 from datetime import datetime, timedelta
 import os
+import json
 
-datapath = "Member/data/MemberList.db"
+# 加载数据路径配置
+def _load_datapath_from_script_config():
+	cfg_file = os.path.join(os.path.dirname(__file__), 'config.json')
+	if os.path.exists(cfg_file):
+		try:
+			with open(cfg_file, 'r', encoding='utf-8') as f:
+				cfg = json.load(f)
+				return cfg.get('datapath')
+		except Exception:
+			return None
+	return None
+
+
+_cfg_datapath = _load_datapath_from_script_config()
+if _cfg_datapath:
+	datapath = _cfg_datapath
+else:
+	datapath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data', 'MemberList.db'))
 
 
 def get_connection():
