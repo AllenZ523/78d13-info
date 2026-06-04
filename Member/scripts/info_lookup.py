@@ -54,12 +54,18 @@ def query_all():
 	return rows
 
 
+def print_member():
+	conn = get_connection()
+	c = conn.cursor()
+	c.execute("PRAGMA table_info(members);")
+	header = [col[1] for col in c.fetchall()]
+	print(" | ".join(header))
+
+
 def print_rows(rows):
 	if not rows:
 		print("未找到记录。")
 		return
-	# 列顺序: gaijin_id, name, state, join_date
-	print("gaijin_id | name | state | join_date")
 	for r in rows:
 		print(" | ".join(str(x) for x in r))
 
@@ -75,6 +81,8 @@ def main():
 		print(f"数据库文件不存在: {datapath}")
 		return
 
+	print_member()
+	
 	if args.gaijin:
 		rows = query_by_gaijin(args.gaijin)
 		print_rows(rows)
