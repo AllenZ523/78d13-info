@@ -83,9 +83,9 @@ def print_member(row):
 
 def main():
     parser = argparse.ArgumentParser(description="按 gaijin_id 修改成员信息（name/state）")
-    parser.add_argument('gaijin_id', help='要修改的外籍号（必填）')
+    parser.add_argument('gaijin_id', help='要修改的盖金号（必填）')
     parser.add_argument('--name', help='新的姓名')
-    parser.add_argument('--state', help='新的状态')
+    parser.add_argument('--state', help='新的阶段')
     parser.add_argument('--time', help='新的加入日期（格式: YYYY-MM-DD）')
 
     args = parser.parse_args()
