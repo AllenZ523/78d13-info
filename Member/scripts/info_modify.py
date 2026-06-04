@@ -83,7 +83,7 @@ def main():
     parser = argparse.ArgumentParser(description="按 gaijin_id 修改成员信息（name/state）")
     parser.add_argument('gaijin_id', help='要修改的盖金号（必填）')
     parser.add_argument('--name', help='新的姓名')
-    parser.add_argument('--state', help='新的状态')
+    parser.add_argument('--state', help='新的阶段')
     parser.add_argument('--show', action='store_true', help='仅显示当前记录，不做修改')
     args = parser.parse_args()
 
