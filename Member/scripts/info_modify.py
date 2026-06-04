@@ -37,9 +37,9 @@ def fetch_member(gaijin_id):
     return row
 
 
-def update_member(gaijin_id, name=None, state=None):
-    if name is None and state is None:
-        print("未提供要更新的字段，请使用 --name 和/或 --state。")
+def update_member(gaijin_id, name=None, state=None, join_date=None):
+    if name is None and state is None and join_date is None:
+        print("未提供要更新的字段，请使用 --name 和/或 --state 和/或 --time。")
         return False
 
     conn = get_connection()
@@ -53,6 +53,9 @@ def update_member(gaijin_id, name=None, state=None):
     if state is not None:
         fields.append("state = ?")
         params.append(state)
+    if join_date is not None:
+        fields.append("join_date = ?")
+        params.append(join_date)
     params.append(gaijin_id)
     sql = f"UPDATE members SET {', '.join(fields)} WHERE gaijin_id = ?"
     try:
@@ -74,7 +77,6 @@ def print_member(row):
     if not row:
         print("未找到记录。")
         return
-    # 列顺序假定为: gaijin_id, name, state, join_date
     print("gaijin_id | name | state | join_date")
     print(" | ".join(str(x) for x in row))
 
@@ -84,7 +86,8 @@ def main():
     parser.add_argument('gaijin_id', help='要修改的外籍号（必填）')
     parser.add_argument('--name', help='新的姓名')
     parser.add_argument('--state', help='新的状态')
-    parser.add_argument('--show', action='store_true', help='仅显示当前记录，不做修改')
+    parser.add_argument('--time', help='新的加入日期（格式: YYYY-MM-DD）')
+
     args = parser.parse_args()
 
     if not os.path.exists(datapath):
@@ -93,10 +96,6 @@ def main():
 
     gaijin = args.gaijin_id.strip()
     before = fetch_member(gaijin)
-    if args.show:
-        print("修改前：")
-        print_member(before)
-        return
 
     if before is None:
         print("未找到对应成员，无法修改。")
@@ -105,7 +104,7 @@ def main():
     print("修改前：")
     print_member(before)
 
-    ok = update_member(gaijin, name=args.name, state=args.state)
+    ok = update_member(gaijin, name=args.name, state=args.state, join_date=args.time)
     if not ok:
         print("更新操作未成功。")
         return
