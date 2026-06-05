@@ -100,7 +100,9 @@ def excel_to_db(xlsx_path: str, db_path: str, table_name: str):
 
         def _has_value(v):
             return v is not None and str(v).strip() != ""
-
+        
+        if _has_value(name):
+            cmd_mod += ["--name", str(name)]
         if _has_value(state):
             cmd_mod += ["--state", str(state)]
         if _has_value(join_date):
@@ -142,7 +144,7 @@ def main():
     parser = argparse.ArgumentParser(description="从xlsx批量导入数据到sqlite")
     parser.add_argument('--xlsx', help='xlsx文件路径，默认为脚本同级目录下的data文件夹', default=None)
     args = parser.parse_args()
-    
+
     # 配置日志记录
     logging.basicConfig(
         level=logging.INFO,
