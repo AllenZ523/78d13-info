@@ -5,7 +5,7 @@ import os
 import json
 
 # 加载数据路径配置
-def _load_datapath_from_script_config():
+def _load_config():
 	cfg_file = os.path.join(os.path.dirname(__file__), 'config.json')
 	if os.path.exists(cfg_file):
 		try:
@@ -17,7 +17,7 @@ def _load_datapath_from_script_config():
 	return None
 
 
-_cfg_datapath = _load_datapath_from_script_config()
+_cfg_datapath = _load_config()
 if _cfg_datapath:
 	datapath = _cfg_datapath
 else:
