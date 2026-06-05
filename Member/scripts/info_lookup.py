@@ -106,6 +106,7 @@ def main():
 	elif args.all:
 		rows = query_all()
 		print_rows(rows)
+		print(f"总记录数: {len(rows)}")
 	else:
 		parser.print_help()
 
