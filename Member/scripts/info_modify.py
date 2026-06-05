@@ -137,6 +137,7 @@ def main():
     parser.add_argument('--landforce', help='新的陆军认证状态（Uncertified/Certified）')
     parser.add_argument('--airforce', help='新的空军认证状态（Uncertified/Certified）')
     parser.add_argument('--navy', help='新的海军认证状态（Uncertified/Certified）')
+    parser.add_argument('--delete','-d',help='删除成员')
 
     args = parser.parse_args()
 
@@ -150,6 +151,24 @@ def main():
 
     if before is None:
         logging.error(f"未找到对应成员: {gaijin}。无法修改。")
+        return
+    
+    if args.delete:
+        conn = get_connection()
+        c = conn.cursor()
+        print(f"即将删除成员: gaijin_id={gaijin}，信息={before}。(Y/N)")
+        choice = input().strip().upper()
+        if choice != "Y":
+            print("删除操作已取消。")
+            return
+        try:
+            c.execute("DELETE FROM members WHERE gaijin_id = ?", (gaijin,))
+            conn.commit()
+            logging.info(f"已删除成员: gaijin_id={gaijin}，信息={before}")
+        except Exception as e:
+            logging.error(f"删除失败：{e}")
+        finally:
+            conn.close()
         return
 
     ok = update_member(gaijin, name=args.name, state=args.state, join_date=args.time, landforce=args.landforce, airforce=args.airforce, navy=args.navy)
