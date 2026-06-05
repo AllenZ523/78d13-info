@@ -2,6 +2,9 @@ import sqlite3
 import os
 import json
 import argparse
+import sys
+from datetime import datetime
+import logging
 
 # 基目录
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -10,11 +13,12 @@ BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 DATA_DIR = None
 datapath = None
 config_path = None
+log_path = None
 
 
 def set_data_dir(path: str = None):
-    """根据传入或默认路径设置 DATA_DIR、datapath 和 config_path。"""
-    global DATA_DIR, datapath, config_path
+    """根据传入或默认路径设置 DATA_DIR、datapath、config_path 和 log_path。"""
+    global DATA_DIR, datapath, config_path, log_path
     if path:
         DATA_DIR = os.path.abspath(path)
     else:
@@ -22,24 +26,24 @@ def set_data_dir(path: str = None):
     os.makedirs(DATA_DIR, exist_ok=True)
     datapath = os.path.join(DATA_DIR, 'MemberList.db')
     config_path = os.path.join(BASE_DIR, 'scripts', 'config.json')
+    log_path = os.path.join(BASE_DIR, 'data', 'run.log')
+    logging.basicConfig(
+        level=logging.INFO,
+        handlers=[logging.FileHandler(log_path, encoding='utf-8')],
+        format='%(asctime)s - [%(levelname)s] %(message)s',
+        datefmt='%Y-%m-%dT%H:%M:%S'
+    )
 
 
 def save_config(path: str = None):
     cfg = {
-        'datapath': path or datapath
+        'datapath': path or datapath,
+        'logpath': log_path
     }
     with open(config_path, 'w', encoding='utf-8') as f:
         json.dump(cfg, f, ensure_ascii=False, indent=2)
 
 
-def load_config():
-    if config_path and os.path.exists(config_path):
-        try:
-            with open(config_path, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except Exception:
-            return None
-    return None
 
 def init_members():
     conn = sqlite3.connect(datapath)
@@ -75,3 +79,4 @@ if __name__ == "__main__":
     # 保存配置
     save_config(datapath)
     print(f"=78D13= 联队成员数据库已在 {datapath} 初始化，并已保存配置到 {config_path}。")
+    logging.info(f"数据库已在{datapath}初始化完成，配置已保存到{config_path}")

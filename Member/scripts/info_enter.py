@@ -3,25 +3,40 @@ import argparse
 from datetime import datetime, timedelta, UTC
 import os
 import json
+import logging
 
-# 加载数据路径配置
 def _load_config():
-	cfg_file = os.path.join(os.path.dirname(__file__), 'config.json')
-	if os.path.exists(cfg_file):
-		try:
-			with open(cfg_file, 'r', encoding='utf-8') as f:
-				cfg = json.load(f)
-				return cfg.get('datapath')
-		except Exception:
-			return None
-	return None
+    cfg_file = os.path.join(os.path.dirname(__file__), 'config.json')
+    if os.path.exists(cfg_file):
+        try:
+            with open(cfg_file, 'r', encoding='utf-8') as f:
+                cfg = json.load(f)
+                return cfg
+        except Exception:
+            return {}
+    return {}
+
+cfg_dict = _load_config()
 
 
-_cfg_datapath = _load_config()
-if _cfg_datapath:
-	datapath = _cfg_datapath
+if cfg_dict.get("datapath"):
+    datapath = cfg_dict["datapath"]
 else:
-	datapath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data', 'MemberList.db'))
+    datapath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data', 'MemberList.db'))
+
+
+if cfg_dict.get("logpath"):
+    log_path = cfg_dict["logpath"]
+else:
+    log_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data', 'run.log'))
+
+# 配置 logging（追加写入 log_path）
+logging.basicConfig(
+	level=logging.INFO,
+	handlers=[logging.FileHandler(log_path, encoding='utf-8')],
+	format='%(asctime)s - [%(levelname)s] %(message)s',
+	datefmt='%Y-%m-%dT%H:%M:%S'
+)
 
 
 def get_connection():
@@ -39,11 +54,11 @@ def add_member(gaijin_id: str, name: str) -> bool:
 				  (gaijin_id, name, state, join_date))
 		conn.commit()
 	except sqlite3.IntegrityError as e:
-		print(f"插入失败：{e}")
+		logging.error(f"插入失败：{e}")
 		conn.close()
 		return False
 	conn.close()
-	print(f"已添加：gaijin_id={gaijin_id}, name={name}, state={state}, join_date={join_date}")
+	logging.info(f"已添加：gaijin_id={gaijin_id}, name={name}, state={state}, join_date={join_date}")
 	return True
 
 

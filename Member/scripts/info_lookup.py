@@ -3,24 +3,30 @@ import argparse
 import os
 import json
 
-# 加载数据路径配置
 def _load_config():
-	cfg_file = os.path.join(os.path.dirname(__file__), 'config.json')
-	if os.path.exists(cfg_file):
-		try:
-			with open(cfg_file, 'r', encoding='utf-8') as f:
-				cfg = json.load(f)
-				return cfg.get('datapath')
-		except Exception:
-			return None
-	return None
+    cfg_file = os.path.join(os.path.dirname(__file__), 'config.json')
+    if os.path.exists(cfg_file):
+        try:
+            with open(cfg_file, 'r', encoding='utf-8') as f:
+                cfg = json.load(f)
+                return cfg
+        except Exception:
+            return {}
+    return {}
+
+cfg_dict = _load_config()
 
 
-_cfg_datapath = _load_config()
-if _cfg_datapath:
-	datapath = _cfg_datapath
+if cfg_dict.get("datapath"):
+    datapath = cfg_dict["datapath"]
 else:
-	datapath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data', 'MemberList.db'))
+    datapath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data', 'MemberList.db'))
+
+
+if cfg_dict.get("logpath"):
+    log_path = cfg_dict["logpath"]
+else:
+    log_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data', 'run.log'))
 
 
 def get_connection():

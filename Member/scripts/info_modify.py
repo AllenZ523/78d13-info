@@ -3,25 +3,41 @@ import argparse
 import os
 import json
 from datetime import datetime
+import logging
 
-# 加载数据路径配置
+
 def _load_config():
     cfg_file = os.path.join(os.path.dirname(__file__), 'config.json')
     if os.path.exists(cfg_file):
         try:
             with open(cfg_file, 'r', encoding='utf-8') as f:
                 cfg = json.load(f)
-                return cfg.get('datapath')
+                return cfg
         except Exception:
-            return None
-    return None
+            return {}
+    return {}
+
+cfg_dict = _load_config()
 
 
-_cfg_datapath = _load_config()
-if _cfg_datapath:
-    datapath = _cfg_datapath
+if cfg_dict.get("datapath"):
+    datapath = cfg_dict["datapath"]
 else:
     datapath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data', 'MemberList.db'))
+
+
+if cfg_dict.get("logpath"):
+    log_path = cfg_dict["logpath"]
+else:
+    log_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data', 'run.log'))
+
+# 配置 logging（追加写入 log_path）
+logging.basicConfig(
+    level=logging.INFO,
+    handlers=[logging.FileHandler(log_path, encoding='utf-8')],
+    format='%(asctime)s - [%(levelname)s] %(message)s',
+    datefmt='%Y-%m-%dT%H:%M:%S'
+)
 
 
 def get_connection():
@@ -85,13 +101,13 @@ def update_member(gaijin_id, name=None, state=None, join_date=None, landforce=No
         c.execute(sql, tuple(params))
         conn.commit()
     except sqlite3.IntegrityError as e:
-        print(f"更新失败：{e}")
+        logging.error(f"更新失败：{e}")
         conn.close()
         return False
     changed = c.rowcount
     conn.close()
     if changed == 0:
-        print("未找到匹配的 gaijin_id，未做任何修改。")
+        logging.error(f"未找到匹配的 gaijin_id：{gaijin_id}。未做任何修改。")
         return False
     return True
 
@@ -127,28 +143,24 @@ def main():
 
     if not os.path.exists(datapath):
         print(f"数据库文件不存在: {datapath}。请先运行初始化脚本或检查路径。")
+        logging.error(f"数据库文件不存在: {datapath}。无法修改成员信息。")
         return
 
     gaijin = args.gaijin_id.strip()
     before = fetch_member(gaijin)
 
     if before is None:
-        print("未找到对应成员，无法修改。")
+        logging.error(f"未找到对应成员: {gaijin}。无法修改。")
         return
-
-    print("修改前：")
-    print_member()
-    print_rows([before])
 
     ok = update_member(gaijin, name=args.name, state=args.state, join_date=args.time, landforce=args.landforce, airforce=args.airforce, navy=args.navy)
     if not ok:
-        print("更新操作未成功。")
+        logging.error(f"更新操作未成功: {gaijin}。")
         return
 
     after = fetch_member(gaijin)
-    print("修改后：")
-    print_member()
-    print_rows([after])
+
+    logging.info(f"修改成员信息：gaijin_id={gaijin}，修改前={before}，修改后={after}")
 
 
 if __name__ == '__main__':
