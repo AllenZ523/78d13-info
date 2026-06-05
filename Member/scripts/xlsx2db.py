@@ -47,7 +47,7 @@ def excel_to_db(xlsx_path: str, db_path: str, table_name: str):
             logging.error(f"Excel缺少必填列：{col}")
             return
 
-    # 逐行循环(从第2行数据开始)
+    # 逐行循环
     for row_idx, row in enumerate(ws.iter_rows(min_row=2, values_only=True), start=2):
         gaijin_id = row[col_map["gaijin_id"]]
         name      = row[col_map["name"]]
@@ -57,12 +57,11 @@ def excel_to_db(xlsx_path: str, db_path: str, table_name: str):
         airforce  = row[col_map["airforce"]]
         navy      = row[col_map["navy"]]
 
-        # 主键为空跳过本行
         if not gaijin_id:
-            logging.info(f"行={row_idx} id=- 操作=跳过 原因=盖金号为空")
+            logging.info(f"本次处理条目：行={row_idx} id=- 操作=跳过 原因=盖金号为空")
             continue
 
-        # 为每行汇总状态，最终只输出一行结构化日志
+        # 汇总状态
         row_status = {
             'row': row_idx,
             'id': gaijin_id,
@@ -74,7 +73,7 @@ def excel_to_db(xlsx_path: str, db_path: str, table_name: str):
             'modify_err': ''
         }
 
-        # 查询（通过退出码或 stdout 判断未找到）
+        # 查询
         cmd_lookup = ["python", "info_lookup.py", "--gaijin", str(gaijin_id)]
         res_look = subprocess.run(cmd_lookup, capture_output=True, text=True, encoding="gbk")
 
@@ -85,7 +84,7 @@ def excel_to_db(xlsx_path: str, db_path: str, table_name: str):
             if res_enter.returncode != 0:
                 row_status['error'] = '新增失败'
                 row_status['enter_err'] = (res_enter.stderr or '').strip()
-                logging.error(f"行={row_idx} id={gaijin_id} 操作=新增 结果=失败 错误={row_status['enter_err']}")
+                logging.error(f"本次处理条目：行={row_idx} id={gaijin_id} 操作=新增 结果=失败 错误={row_status['enter_err']}")
                 continue
             row_status['created'] = True
 
@@ -93,7 +92,7 @@ def excel_to_db(xlsx_path: str, db_path: str, table_name: str):
             res_confirm = subprocess.run(cmd_lookup, capture_output=True, text=True, encoding="gbk")
             if res_confirm.returncode != 0 or ("未找到记录" in (res_confirm.stdout or "")):
                 row_status['error'] = '新增未确认'
-                logging.error(f"行={row_idx} id={gaijin_id} 操作=新增 结果=失败 原因=未确认")
+                logging.error(f"本次处理条目：行={row_idx} id={gaijin_id} 操作=新增 结果=失败 原因=未确认")
                 continue
 
         # 执行modify更新字段
@@ -132,9 +131,9 @@ def excel_to_db(xlsx_path: str, db_path: str, table_name: str):
             action_parts.append('无变化')
 
         if row_status['error']:
-            logging.error(f"行={row_idx} id={gaijin_id} 操作={'、'.join(action_parts)} 结果=失败 错误={row_status['error']} 新增错误={row_status['enter_err']} 修改错误={row_status['modify_err']}")
+            logging.error(f"本次处理条目：行={row_idx} id={gaijin_id} 操作={'、'.join(action_parts)} 结果=失败 错误={row_status['error']} 新增错误={row_status['enter_err']} 修改错误={row_status['modify_err']}")
         else:
-            logging.info(f"行={row_idx} id={gaijin_id} 操作={'、'.join(action_parts)} 结果=成功")
+            logging.info(f"本次处理条目：行={row_idx} id={gaijin_id} 操作={'、'.join(action_parts)} 结果=成功")
 
     logging.info(f"已经使用 {xlsx_path} 批量导入数据到数据库。")
 
@@ -143,7 +142,7 @@ def main():
     parser = argparse.ArgumentParser(description="从xlsx批量导入数据到sqlite")
     parser.add_argument('--xlsx', help='xlsx文件路径，默认为脚本同级目录下的data文件夹', default=None)
     args = parser.parse_args()
-
+    
     # 配置日志记录
     logging.basicConfig(
         level=logging.INFO,
@@ -158,6 +157,8 @@ def main():
     # 默认xlsx路径：脚本同级目录
     
     excel_to_db(args.xlsx, None, None)
+
+    print("数据导入完成，请查看日志确认结果。")
 
 
 if __name__ == "__main__":
