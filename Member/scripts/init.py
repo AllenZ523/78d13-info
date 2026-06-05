@@ -38,7 +38,12 @@ def set_data_dir(path: str = None):
 def save_config(path: str = None):
     cfg = {
         'datapath': path or datapath,
-        'logpath': log_path
+        'logpath': log_path,
+        "log_level": "INFO",
+        "log_format": "%(asctime)s - [%(levelname)s] %(message)s",
+        "date_fmt": "%Y-%m-%dT%H:%M:%S",
+        "log_path": "./app.log",
+        "encoding": "utf-8"
     }
     with open(config_path, 'w', encoding='utf-8') as f:
         json.dump(cfg, f, ensure_ascii=False, indent=2)

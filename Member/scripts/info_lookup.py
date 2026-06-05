@@ -2,6 +2,7 @@ import sqlite3
 import argparse
 import os
 import json
+import sys
 
 def _load_config():
     cfg_file = os.path.join(os.path.dirname(__file__), 'config.json')
@@ -70,8 +71,9 @@ def print_member():
 
 def print_rows(rows):
 	if not rows:
-		print("未找到记录。")
-		return
+		print("未找到记录")
+		# 对于查询单条记录的场景，返回非零以便调用者判断未找到
+		sys.exit(1)
 	for r in rows:
 		print(" | ".join(str(x) for x in r))
 
@@ -91,9 +93,15 @@ def main():
 	
 	if args.gaijin:
 		rows = query_by_gaijin(args.gaijin)
+		if not rows:
+			print("未找到记录")
+			sys.exit(1)
 		print_rows(rows)
 	elif args.name:
 		rows = query_by_name(args.name)
+		if not rows:
+			print("未找到记录")
+			sys.exit(1)
 		print_rows(rows)
 	elif args.all:
 		rows = query_all()

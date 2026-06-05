@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, UTC
 import os
 import json
 import logging
+import sys
 
 def _load_config():
     cfg_file = os.path.join(os.path.dirname(__file__), 'config.json')
@@ -76,7 +77,8 @@ def main():
 		print("gaijin_id 和 name 都为必填字段。")
 		return
 
-	add_member(args.gaijin_id.strip(), args.name.strip())
+	ok = add_member(args.gaijin_id.strip(), args.name.strip())
+	sys.exit(0 if ok else 1)
 
 
 if __name__ == '__main__':

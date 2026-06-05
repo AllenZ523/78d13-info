@@ -31,7 +31,6 @@ if cfg_dict.get("logpath"):
 else:
     log_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data', 'run.log'))
 
-# 配置 logging（追加写入 log_path）
 logging.basicConfig(
     level=logging.INFO,
     handlers=[logging.FileHandler(log_path, encoding='utf-8')],
