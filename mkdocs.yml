@@ -1,0 +1,19 @@
+site_name: 78D13联队公开文档
+
+docs_dir: .
+
+theme:
+  name: material
+
+nav:
+  - 首页: index.md
+
+  - Promotion:
+      - 空军晋升: Promotion/AirForce.md
+      - 陆军晋升: Promotion/LandForce.md
+
+  - RegimentStandards:
+      - 总则: RegimentStandards/GeneralRules.md
+      - 晋升: RegimentStandards/Promotion.md
+      - 联队队标及认证规范: RegimentStandards/RegimentMarks.md
+      - 联队架构图: RegimentStandards/RegimentOrganizationalStructure.md
