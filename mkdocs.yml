@@ -1,6 +1,6 @@
 site_name: 78D13联队公开文档
 
-docs_dir: .
+docs_dir: docs
 
 theme:
   name: material
