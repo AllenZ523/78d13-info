@@ -1,1 +1,6 @@
 *.pdf
+*.json
+*.db
+*.log
+*.xlsx
+*.xls
